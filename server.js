@@ -1,17 +1,32 @@
+
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// Frontend files serve karo
+app.use(express.static(__dirname));
+
+// Home page
 app.get("/", (req, res) => {
-  res.send("Shino AI is running!");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// Shino AI chat
 app.post("/chat", async (req, res) => {
   try {
+    const message = req.body.message;
+
+    if (!message) {
+      return res.status(400).json({
+        reply: "Kuch message likho."
+      });
+    }
+
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -25,11 +40,11 @@ app.post("/chat", async (req, res) => {
           messages: [
             {
               role: "system",
-              content: "Tumhara naam Shino hai. Tum ek friendly Hindi AI assistant ho. Hamesha simple Hindi mein jawab do."
+              content: "Tumhara naam Shino hai. Tum ek friendly female Hindi AI assistant ho. Simple Hindi mein jawab do."
             },
             {
               role: "user",
-              content: req.body.message
+              content: message
             }
           ]
         })
@@ -37,13 +52,26 @@ app.post("/chat", async (req, res) => {
     );
 
     const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(500).json({
+        reply: "AI service mein problem hai."
+      });
+    }
+
     res.json({
-      reply: data.choices?.[0]?.message?.content || "Mujhe jawab nahi mila."
+      reply: data.choices?.[0]?.message?.content || "Jawab nahi mila."
     });
 
   } catch (error) {
-    res.status(500).json({ reply: "Server mein problem hai." });
+    console.error(error);
+    res.status(500).json({
+      reply: "Server mein problem hai."
+    });
   }
 });
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
+  console.log("Shino AI server started");
+});
+
