@@ -6,52 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shino AI</title>
 
-/* SHINO FUTURISTIC FACE */
-
-.shino-face {
-  width: 180px;
-  height: 180px;
-  margin: 20px auto;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    #003b66 0%,
-    #001426 60%,
-    #000 100%
-  );
-  border: 2px solid #00cfff;
-  box-shadow:
-    0 0 20px #00cfff,
-    0 0 50px #0066ff,
-    inset 0 0 25px #00cfff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: shinoPulse 2s infinite ease-in-out;
-}
-
-.shino-face span {
-  font-size: 75px;
-  color: #00eaff;
-  text-shadow:
-    0 0 10px #00eaff,
-    0 0 30px #0088ff;
-}
-
-@keyframes shinoPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 20px #00cfff;
-  }
-
-  50% {
-    transform: scale(1.06);
-    box-shadow: 0 0 45px #00cfff;
-  }
-}
-  
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -59,10 +17,7 @@ body {
   background: radial-gradient(circle at top, #153454, #030914 65%);
   color: #eaf7ff;
   font-family: Arial, sans-serif;
-
-<div class="shino-face">
-  <span>◉</span>
-</div>
+}
 
 .app {
   width: 100%;
@@ -71,7 +26,9 @@ body {
   padding: 20px 15px;
 }
 
-header { text-align: center; }
+header {
+  text-align: center;
+}
 
 h1 {
   color: #54dfff;
@@ -85,22 +42,43 @@ h1 {
   letter-spacing: 2px;
 }
 
-.orb {
-  width: 130px;
-  height: 130px;
-  margin: 20px auto;
+/* SHINO FEMALE AI FACE */
+
+.shino-face {
+  width: 210px;
+  height: 210px;
+  margin: 22px auto;
   border-radius: 50%;
-  background: radial-gradient(circle, #b8ffff, #16a9e8 35%, #073b70 70%);
-  box-shadow: 0 0 25px #00bfff, 0 0 65px #0077ff;
-  animation: pulse 3s infinite ease-in-out;
+  overflow: hidden;
+  border: 3px solid #00cfff;
+  box-shadow:
+    0 0 20px #00cfff,
+    0 0 50px #0066ff,
+    inset 0 0 25px #00cfff;
+  animation: shinoPulse 2.5s infinite ease-in-out;
 }
 
-.orb.active {
-  box-shadow: 0 0 40px #00ffff, 0 0 90px #008cff;
+.shino-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-@keyframes pulse {
-  50% { transform: scale(1.06); }
+.shino-face.active {
+  box-shadow:
+    0 0 35px #00ffff,
+    0 0 75px #008cff,
+    0 0 110px #0066ff;
+}
+
+@keyframes shinoPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
 }
 
 .panel {
@@ -119,7 +97,8 @@ h1 {
   letter-spacing: 2px;
 }
 
-.dash-grid, .app-grid {
+.dash-grid,
+.app-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -231,8 +210,14 @@ button {
   margin-top: 14px;
 }
 
-.stop { background: #a52b43; }
-.small { background: #164b62; font-size: 12px; }
+.stop {
+  background: #a52b43;
+}
+
+.small {
+  background: #164b62;
+  font-size: 12px;
+}
 
 footer {
   text-align: center;
@@ -241,7 +226,9 @@ footer {
   margin-top: 18px;
 }
 
-#cameraInput { display: none; }
+#cameraInput {
+  display: none;
+}
 </style>
 </head>
 
@@ -253,10 +240,16 @@ footer {
   <div id="status">SYSTEM ONLINE</div>
 </header>
 
-<div class="orb" id="orb"></div>
+<div class="shino-face" id="orb">
+  <img
+    src="file_0000000036c48206820693d46547d6bd.png"
+    alt="Shino Female AI Face"
+  >
+</div>
 
 <section class="panel">
   <h2>JARVIS DASHBOARD</h2>
+
   <div class="dash-grid">
 
     <div class="dash-card">
@@ -330,6 +323,7 @@ footer {
 </div>
 
 <footer>SHINO AI • ADVANCED VOICE ASSISTANT</footer>
+
 </main>
 
 <script>
@@ -903,8 +897,10 @@ function setupVoice() {
     } else if (event.error === "service-not-allowed") {
       listening = false;
       setStatus("VOICE SERVICE BLOCKED");
-    } else if (event.error !== "no-speech" &&
-               event.error !== "aborted") {
+    } else if (
+      event.error !== "no-speech" &&
+      event.error !== "aborted"
+    ) {
       setStatus("VOICE ERROR: " + event.error);
     }
   };
