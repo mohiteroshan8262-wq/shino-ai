@@ -1,14 +1,18 @@
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
+// HTML, images aur doosri static files serve karega
+app.use(express.static(__dirname));
+
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.post("/chat", async (req, res) => {
@@ -21,12 +25,10 @@ app.post("/chat", async (req, res) => {
       });
     }
 
-    // Previous chat memory
     const history = Array.isArray(req.body.history)
       ? req.body.history.slice(-12)
       : [];
 
-    // Personal memory
     const personalMemory =
       typeof req.body.personalMemory === "string"
         ? req.body.personalMemory.slice(0, 2000)
@@ -115,17 +117,19 @@ Jhoothe daave mat karo.`
     const reply =
       data.choices?.[0]?.message?.content || "Jawab nahi mila.";
 
-    res.json({ reply });
+    return res.json({ reply });
 
   } catch (error) {
     console.error("Server Error:", error);
 
-    res.status(500).json({
-      reply: "Server mein problem hai. Dobara try karo."
+    return res.status(500).json({
+      reply: "Server mein problem hui. Dobara try karo."
     });
   }
 });
 
-app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
-  console.log("Shino AI server started");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Shino AI server running on port ${PORT}`);
 });
