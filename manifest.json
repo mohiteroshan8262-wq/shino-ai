@@ -1,0 +1,10 @@
+{
+  "name": "Shino AI",
+  "short_name": "Shino",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#030914",
+  "theme_color": "#030914",
+  "description": "Shino AI Personal Assistant"
+}
