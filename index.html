@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shino AI - JARVIS</title>
+<title>Shino AI</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -30,7 +30,6 @@ h1 {
   color: #54dfff;
   letter-spacing: 5px;
   text-shadow: 0 0 15px #00bfff;
-  margin-bottom: 5px;
 }
 
 #status {
@@ -57,9 +56,8 @@ h1 {
   50% { transform: scale(1.06); }
 }
 
-/* JARVIS DASHBOARD */
-#dashboard {
-  margin: 20px 0;
+.panel {
+  margin: 18px 0;
   padding: 15px;
   border: 1px solid #1686b9;
   border-radius: 18px;
@@ -67,14 +65,14 @@ h1 {
   box-shadow: 0 0 20px #0077ff22;
 }
 
-#dashboard h2 {
+.panel h2 {
   text-align: center;
   color: #54dfff;
   font-size: 17px;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
 }
 
-.dash-grid {
+.dash-grid, .app-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -92,12 +90,11 @@ h1 {
 .dash-card span {
   color: #75dfff;
   font-size: 12px;
-  letter-spacing: 1px;
 }
 
 .dash-card h3 {
-  color: #ffffff;
-  font-size: 19px;
+  color: white;
+  font-size: 18px;
   margin: 10px 0 5px;
   overflow-wrap: anywhere;
 }
@@ -106,6 +103,19 @@ h1 {
   color: #9ac9df;
   font-size: 12px;
   margin: 4px 0;
+}
+
+.app-grid button {
+  min-height: 55px;
+  border: 1px solid #176c96;
+  background: #0b304b;
+  font-size: 14px;
+}
+
+#appMessage {
+  text-align: center;
+  color: #8bdcf5;
+  font-size: 12px;
 }
 
 #chat {
@@ -145,7 +155,7 @@ form {
   margin-top: 15px;
 }
 
-input {
+input[type="text"] {
   flex: 1;
   min-width: 0;
   padding: 14px;
@@ -184,6 +194,8 @@ footer {
   font-size: 11px;
   margin-top: 18px;
 }
+
+#cameraInput { display: none; }
 </style>
 </head>
 
@@ -197,7 +209,8 @@ footer {
 
 <div class="orb" id="orb"></div>
 
-<section id="dashboard">
+<!-- JARVIS DASHBOARD -->
+<section class="panel">
   <h2>JARVIS DASHBOARD</h2>
 
   <div class="dash-grid">
@@ -210,7 +223,7 @@ footer {
     <div class="dash-card">
       <span>🔋 BATTERY</span>
       <h3 id="battery">Checking...</h3>
-      <p id="charging">Checking status...</p>
+      <p id="charging">Checking...</p>
     </div>
 
     <div class="dash-card">
@@ -227,16 +240,41 @@ footer {
   </div>
 </section>
 
+<!-- APP LAUNCHER -->
+<section class="panel">
+  <h2>🚀 APP LAUNCHER</h2>
+
+  <div class="app-grid">
+    <button onclick="openApp('youtube')">▶ YouTube</button>
+    <button onclick="openApp('whatsapp')">💬 WhatsApp</button>
+    <button onclick="openApp('chrome')">🌐 Chrome</button>
+    <button onclick="openApp('camera')">📷 Camera</button>
+  </div>
+
+  <p id="appMessage">Choose an app to open</p>
+
+  <input
+    type="file"
+    id="cameraInput"
+    accept="image/*"
+    capture="environment"
+  >
+</section>
+
+<!-- CHAT -->
 <section id="chat" aria-live="polite">
   <div class="message bot">
-    नमस्ते! मैं Shino हूँ। मेरा JARVIS Dashboard तैयार है। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?
+    नमस्ते! मैं Shino हूँ। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?
   </div>
 </section>
 
 <form id="form">
-  <input id="input" type="text"
+  <input
+    id="input"
+    type="text"
     placeholder="Shino से कुछ पूछें..."
-    autocomplete="off">
+    autocomplete="off"
+  >
   <button type="submit">SEND</button>
 </form>
 
@@ -268,13 +306,17 @@ let history = [];
 let personalMemory = "";
 
 try {
-  history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-  personalMemory = localStorage.getItem(MEMORY_KEY) || "";
+  history = JSON.parse(
+    localStorage.getItem(HISTORY_KEY) || "[]"
+  );
+
+  personalMemory =
+    localStorage.getItem(MEMORY_KEY) || "";
 } catch (error) {
   console.log("Memory loading error:", error);
 }
 
-/* CLOCK AND DATE */
+/* JARVIS CLOCK */
 function updateClock() {
   const now = new Date();
 
@@ -316,13 +358,12 @@ async function updateBattery() {
     }
 
     showBattery();
-
     battery.addEventListener("levelchange", showBattery);
     battery.addEventListener("chargingchange", showBattery);
 
   } catch (error) {
     batteryText.textContent = "Unavailable";
-    chargingText.textContent = "Permission unavailable";
+    chargingText.textContent = "Status unavailable";
   }
 }
 
@@ -336,16 +377,117 @@ function updateInternet() {
     online ? "CONNECTED" : "OFFLINE";
 
   document.getElementById("networkInfo").textContent =
-    online ? "Internet available" : "Check your connection";
+    online ? "Internet available" : "Check connection";
 }
 
 window.addEventListener("online", updateInternet);
 window.addEventListener("offline", updateInternet);
 updateInternet();
 
-/* SYSTEM STATUS */
 function setStatus(message) {
   statusText.textContent = message;
+}
+
+/* APP LAUNCHER */
+function openApp(appName) {
+  const message = document.getElementById("appMessage");
+
+  const apps = {
+    youtube: {
+      label: "YouTube",
+      url: "https://www.youtube.com"
+    },
+    whatsapp: {
+      label: "WhatsApp",
+      url: "https://wa.me/"
+    },
+    chrome: {
+      label: "Chrome",
+      url: "https://www.google.com/chrome/"
+    }
+  };
+
+  if (appName === "camera") {
+    message.textContent = "Camera selection खुल रही है...";
+
+    document.getElementById("cameraInput").click();
+    return;
+  }
+
+  const app = apps[appName];
+
+  if (!app) {
+    message.textContent = "App नहीं मिला।";
+    return;
+  }
+
+  message.textContent = app.label + " खोलने की कोशिश हो रही है...";
+
+  window.open(app.url, "_blank", "noopener");
+
+}
+
+/* CAMERA SELECTION */
+document.getElementById("cameraInput").addEventListener(
+  "change",
+  (event) => {
+    if (event.target.files.length) {
+      document.getElementById("appMessage").textContent =
+        "Photo select हो गई है।";
+    }
+  }
+);
+
+/* VOICE COMMANDS FOR APPS */
+function handleAppCommand(message) {
+  const text = message.toLowerCase().trim();
+
+  const commands = [
+    {
+      words: ["youtube", "यूट्यूब"],
+      app: "youtube"
+    },
+    {
+      words: ["whatsapp", "व्हाट्सएप", "व्हाट्स ऐप"],
+      app: "whatsapp"
+    },
+    {
+      words: ["chrome", "क्रोम"],
+      app: "chrome"
+    },
+    {
+      words: ["camera", "कैमरा"],
+      app: "camera"
+    }
+  ];
+
+  const openWords = [
+    "open", "खोलो", "खोल दो", "चालू करो"
+  ];
+
+  const hasOpenCommand = openWords.some(
+    word => text.includes(word)
+  );
+
+  if (!hasOpenCommand) return false;
+
+  for (const item of commands) {
+    if (item.words.some(word => text.includes(word))) {
+      openApp(item.app);
+
+      const reply =
+        item.app === "camera"
+          ? "जी, Camera खोलने की कोशिश कर रही हूँ।"
+          : "जी, " + item.app + " खोलने की कोशिश कर रही हूँ।";
+
+      addMessage(reply, "bot");
+      speak(reply);
+
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /* CHAT */
@@ -400,11 +542,23 @@ function speak(text) {
   window.speechSynthesis.speak(speech);
 }
 
-/* AI CHAT AND MEMORY */
+/* AI CHAT AND PERSONAL MEMORY */
 async function sendToAI(message) {
   addMessage(message, "user");
   setStatus("SHINO THINKING...");
 
+  // Check App Launcher commands first
+  if (handleAppCommand(message)) {
+    history.push(
+      { role: "user", content: message },
+      { role: "assistant", content: "App खोलने की कोशिश की गई।" }
+    );
+    saveHistory();
+    setStatus("SHINO ONLINE");
+    return;
+  }
+
+  // Save personal memory only when explicitly requested
   const rememberMatch = message.match(
     /(?:shino\s+)?(?:yaad rakhna|yaad rakh lo|याद रखना|याद रखो|remember this)\s*[:,-]?\s*(.+)/i
   );
