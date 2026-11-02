@@ -5,22 +5,32 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-
 app.post("/chat", async (req, res) => {
   try {
     const message = req.body.message;
 
-    if (!message) {
+    if (!message || typeof message !== "string") {
       return res.status(400).json({
         reply: "Kuch message likho."
       });
     }
+
+    // Previous chat memory
+    const history = Array.isArray(req.body.history)
+      ? req.body.history.slice(-12)
+      : [];
+
+    // Personal memory
+    const personalMemory =
+      typeof req.body.personalMemory === "string"
+        ? req.body.personalMemory.slice(0, 2000)
+        : "";
 
     const apiKey = process.env.GROQ_API_KEY;
 
@@ -32,6 +42,49 @@ app.post("/chat", async (req, res) => {
       });
     }
 
+    const messages = [
+      {
+        role: "system",
+        content: `Tumhara naam Shino AI hai.
+
+Tum ek smart, friendly aur helpful female AI assistant ho.
+
+Hamesha simple aur natural Hindi ya Hinglish mein baat karo.
+
+Tumhara kaam user ke sawalon ke jawab dena, learning, coding, planning aur daily tasks mein madad karna hai.
+
+Agar user pooche ki tum kaun ho, toh apna naam Shino AI batao.
+
+Agar user pooche ki tumhara kaam kya hai, toh apne assistant hone ke baare mein samjhao.
+
+USER KI PERSONAL MEMORY:
+${personalMemory || "Abhi koi personal memory save nahi hai."}
+
+Is memory ko user ke baare mein context samajhne ke liye use karo.
+Agar memory mein koi baat nahi hai, toh uske baare mein andaza mat lagao.
+
+Respectful, natural aur helpful raho.
+Jhoothe daave mat karo.`
+      },
+
+      ...history
+        .filter(
+          item =>
+            item &&
+            ["user", "assistant"].includes(item.role) &&
+            typeof item.content === "string"
+        )
+        .map(item => ({
+          role: item.role,
+          content: item.content.slice(0, 2000)
+        })),
+
+      {
+        role: "user",
+        content: message
+      }
+    ];
+
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -42,34 +95,7 @@ app.post("/chat", async (req, res) => {
         },
         body: JSON.stringify({
           model: "openai/gpt-oss-120b",
-          messages: [
-            {
-              role: "system",
-              content: `Tumhara naam Shino AI hai.
-
-Tum ek smart, friendly aur helpful female AI assistant ho.
-
-Tumhara kaam user ke sawalon ko samajhna aur sahi jawab dena hai.
-
-Hamesha simple aur natural Hindi ya Hinglish mein baat karo.
-
-Agar user pooche ki tum kaun ho, toh apna naam Shino AI batao.
-
-Agar user pooche ki tumhara kaam kya hai, toh batao ki tum questions ke answers, learning, coding, planning aur daily tasks mein madad karti ho.
-
-Jawab clear, useful aur zarurat ke hisaab se detail mein do.
-
-Agar sawal samajh na aaye, toh clarification maango.
-
-Kabhi bhi apni capabilities ke baare mein jhootha daawa mat karo.
-
-User ke saath respectful aur friendly raho.`
-            },
-            {
-              role: "user",
-              content: message
-            }
-          ],
+          messages: messages,
           temperature: 0.7,
           max_tokens: 1024
         })
