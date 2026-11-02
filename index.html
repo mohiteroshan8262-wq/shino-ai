@@ -39,7 +39,7 @@ footer{text-align:center;color:#6c91a8;font-size:11px;margin-top:18px}
 #outfitPreview{display:none;width:100%;max-height:300px;object-fit:contain;border-radius:12px;margin:12px auto;border:1px solid #1686b9}
 .outfit-note{font-size:12px;color:#9ac9df;text-align:center;line-height:1.5}
 #outfitPrompt{width:100%;min-height:100px;margin-top:12px;padding:12px;border-radius:12px;background:#071321;color:white;border:1px solid #1686b9;resize:vertical}
-.upload-button{display:block;text-align:center;margin:10px auto;background:#164b62}
+.upload-button{display:block;text-align:center;margin:10px auto;background:#164b62;padding:12px;border-radius:25px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -76,20 +76,17 @@ footer{text-align:center;color:#6c91a8;font-size:11px;margin-top:18px}
 <input type="file" id="cameraInput" accept="image/*" capture="environment">
 </section>
 
-<!-- OUTFIT CHANGER -->
 <section class="panel" id="outfitChanger">
 <h2>👗 SHINO OUTFIT CHANGER</h2>
 <p class="outfit-note">अपनी फोटो चुनो और पसंद का outfit style select करो।</p>
 
-<label class="upload-button button" for="outfitPhoto">📷 Choose Photo</label>
+<label class="upload-button" for="outfitPhoto">📷 Choose Photo</label>
 <input type="file" id="outfitPhoto" accept="image/*">
 <img id="outfitPreview" alt="Selected photo preview">
 
 <h3 style="text-align:center;color:#54dfff">Choose Outfit</h3>
 <div class="outfit-grid">
-<button onclick="selectOutfit('Bikini Outfit')">
-  👙 Bikini 
-</button>
+<button onclick="selectOutfit('Formal Outfit')">👔 Formal</button>
 <button onclick="selectOutfit('Baggy oversized outfit')">🧥 Baggy</button>
 <button onclick="selectOutfit('Sportswear outfit')">🏃 Sportswear</button>
 <button onclick="selectOutfit('Casual outfit')">👕 Casual</button>
