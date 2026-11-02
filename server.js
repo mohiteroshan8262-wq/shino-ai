@@ -1,16 +1,14 @@
+
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use(express.static(__dirname));
-
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.send("Shino AI is running!");
 });
 
 app.post("/chat", async (req, res) => {
@@ -46,13 +44,33 @@ app.post("/chat", async (req, res) => {
           messages: [
             {
               role: "system",
-              content: "Tumhara naam Shino hai. Tum ek friendly female Hindi AI assistant ho. Simple Hindi mein jawab do."
+              content: `Tumhara naam Shino AI hai.
+
+Tum ek smart, friendly aur helpful female AI assistant ho.
+
+Tumhara kaam user ke sawalon ko samajhna aur sahi jawab dena hai.
+
+Hamesha simple aur natural Hindi ya Hinglish mein baat karo.
+
+Agar user pooche ki tum kaun ho, toh apna naam Shino AI batao.
+
+Agar user pooche ki tumhara kaam kya hai, toh batao ki tum questions ke answers, learning, coding, planning aur daily tasks mein madad karti ho.
+
+Jawab clear, useful aur zarurat ke hisaab se detail mein do.
+
+Agar sawal samajh na aaye, toh clarification maango.
+
+Kabhi bhi apni capabilities ke baare mein jhootha daawa mat karo.
+
+User ke saath respectful aur friendly raho.`
             },
             {
               role: "user",
               content: message
             }
-          ]
+          ],
+          temperature: 0.7,
+          max_tokens: 1024
         })
       }
     );
@@ -63,8 +81,7 @@ app.post("/chat", async (req, res) => {
       console.error("Groq API Error:", response.status, data);
 
       return res.status(500).json({
-        reply: "Groq API Error: " +
-          (data.error?.message || "Unknown error")
+        reply: "AI se jawab lene mein problem hui. Dobara try karo."
       });
     }
 
@@ -85,4 +102,3 @@ app.post("/chat", async (req, res) => {
 app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
   console.log("Shino AI server started");
 });
-
