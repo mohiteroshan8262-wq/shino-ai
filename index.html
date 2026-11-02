@@ -6,6 +6,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shino AI</title>
 
+/* SHINO FUTURISTIC FACE */
+
+.shino-face {
+  width: 180px;
+  height: 180px;
+  margin: 20px auto;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #003b66 0%,
+    #001426 60%,
+    #000 100%
+  );
+  border: 2px solid #00cfff;
+  box-shadow:
+    0 0 20px #00cfff,
+    0 0 50px #0066ff,
+    inset 0 0 25px #00cfff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: shinoPulse 2s infinite ease-in-out;
+}
+
+.shino-face span {
+  font-size: 75px;
+  color: #00eaff;
+  text-shadow:
+    0 0 10px #00eaff,
+    0 0 30px #0088ff;
+}
+
+@keyframes shinoPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px #00cfff;
+  }
+
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 45px #00cfff;
+  }
+}
+  
 <style>
 * { box-sizing: border-box; }
 
