@@ -5,6 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shino AI</title>
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#030914">
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#153454,#030914 65%);color:#eaf7ff;font-family:Arial,sans-serif}
@@ -42,6 +46,7 @@ footer{text-align:center;color:#6c91a8;font-size:11px;margin-top:18px}
 .upload-button{display:block;text-align:center;margin:10px auto;background:#164b62;padding:12px;border-radius:25px;cursor:pointer}
 </style>
 </head>
+
 <body>
 <main class="app">
 
@@ -215,7 +220,6 @@ document.getElementById("cameraInput").addEventListener("change",e=>{
 if(e.target.files.length)document.getElementById("appMessage").textContent="Photo select हो गई है।";
 });
 
-/* OUTFIT CHANGER */
 let selectedPhotoURL=null;
 document.getElementById("outfitPhoto").addEventListener("change",e=>{
 const file=e.target.files[0];
@@ -245,7 +249,6 @@ alert("Prompt select कर दिया है। Copy करें।");
 }
 }
 
-/* PERSONAL MEMORY */
 function showMemory(){
 const reply=personalMemory.trim()?"मेरी Personal Memory:\n"+personalMemory:"अभी मेरी Personal Memory खाली है।";
 addMessage(reply,"bot");speak(reply);
@@ -264,7 +267,6 @@ history.push({role:"user",content:message},{role:"assistant",content:reply});
 saveHistory();return true;
 }
 
-/* LOCAL COMMANDS */
 function handleLocalCommand(message){
 const text=message.toLowerCase().trim();
 if(text.includes("समय बताओ")||text.includes("time batao")||text.includes("what time")){
@@ -283,7 +285,6 @@ if(text.includes("camera")||text.includes("कैमरा")){openApp("camera");
 return false;
 }
 
-/* AI SERVER */
 async function sendToAI(message){
 if(!message.trim())return;
 addMessage(message,"user");setStatus("SHINO THINKING...");
@@ -317,7 +318,6 @@ const message=input.value.trim();if(!message)return;
 input.value="";sendToAI(message);
 };
 
-/* VOICE CONTROL */
 const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
 
 function scheduleRecognition(){
@@ -398,5 +398,16 @@ addMessage("Chat History साफ़ कर दी गई है।","bot");
 
 setStatus("SHINO ONLINE");
 </script>
+
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(()=>console.log("Shino service worker registered"))
+      .catch(error=>console.error("Service worker error:",error));
+  });
+}
+</script>
+
 </body>
 </html>
