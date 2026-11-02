@@ -1,91 +1,325 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINO AI</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #080d18;
+  color: #eaf6ff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  text-align: center;
+  padding: 22px;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  color: #72c8ff;
+  background: #101a2b;
+}
+
+#status {
+  text-align: center;
+  padding: 12px;
+  color: #72c8ff;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.orb {
+  width: 140px;
+  height: 140px;
+  margin: 25px auto;
+  border-radius: 50%;
+  border: 2px solid #46baff;
+  box-shadow: 0 0 25px #168dff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #72c8ff;
+  font-size: 35px;
+}
+
+#chat {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.msg {
+  padding: 13px;
+  margin: 10px 0;
+  border-radius: 12px;
+  max-width: 85%;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.bot {
+  background: #17283d;
+  border-left: 3px solid #46baff;
+}
+
+.user {
+  background: #244b75;
+  margin-left: auto;
+}
+
+.controls {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+button {
+  padding: 13px 17px;
+  border: 1px solid #46baff;
+  border-radius: 10px;
+  background: #10243a;
+  color: white;
+  font-size: 14px;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #101a2b;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px;
+  border-radius: 9px;
+  border: 0;
+  font-size: 16px;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  color: #718ba5;
+  font-size: 11px;
+}
+</style>
+</head>
+
+<body>
+
+<header>SHINO AI</header>
+<div id="status">SYSTEM STANDBY</div>
+<div class="orb" id="orb">S</div>
+
+<main id="chat">
+  <div class="msg bot">
+    नमस्ते! मैं Shino हूँ। Start Listening दबाकर मुझे सक्रिय करें।
+  </div>
+</main>
+
+<div class="controls">
+  <button id="startBtn" type="button">🎙️ Start Listening</button>
+  <button id="stopBtn" type="button">Stop</button>
+</div>
+
+<form id="form">
+  <input id="message" placeholder="Type your message..." autocomplete="off">
+  <button type="submit">Send</button>
+</form>
+
+<footer>SHINO AI · VOICE ASSISTANT</footer>
+
 <script>
-    const form = document.getElementById("form");
-    const input = document.getElementById("message");
-    const chat = document.getElementById("chat");
-    const voiceBtn = document.getElementById("voiceBtn");
+const chat = document.getElementById("chat");
+const statusText = document.getElementById("status");
+const orb = document.getElementById("orb");
+const input = document.getElementById("message");
 
-    let voiceEnabled = true;
+let recognition;
+let listening = false;
+let waitingForCommand = false;
+let speaking = false;
 
-    function addMessage(text, who) {
-      const div = document.createElement("div");
-      div.className = "msg " + who;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-      return div;
-    }
+function addMessage(text, who) {
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
 
-    function speak(text) {
-      if (!voiceEnabled || !("speechSynthesis" in window)) {
-        return;
-      }
+function setStatus(text) {
+  statusText.textContent = text;
+}
 
-      window.speechSynthesis.cancel();
+function startRecognition() {
+  if (!listening || speaking || !recognition) return;
+  try {
+    recognition.start();
+  } catch (e) {}
+}
 
-      const speech = new SpeechSynthesisUtterance(text);
-      speech.lang = "hi-IN";
-      speech.rate = 0.95;
-      speech.pitch = 1.05;
-      speech.volume = 1;
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
 
-      const voices = window.speechSynthesis.getVoices();
-      const hindiVoice = voices.find(v => v.lang === "hi-IN");
+  speaking = true;
+  if (recognition) recognition.stop();
 
-      if (hindiVoice) {
-        speech.voice = hindiVoice;
-      }
+  window.speechSynthesis.cancel();
 
-      window.speechSynthesis.speak(speech);
-    }
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "hi-IN";
+  speech.rate = 0.92;
+  speech.pitch = 1;
 
-    voiceBtn.addEventListener("click", () => {
-      voiceEnabled = !voiceEnabled;
-      voiceBtn.textContent = voiceEnabled
-        ? "🔊 आवाज़ चालू है"
-        : "🔇 आवाज़ बंद है";
+  const voices = window.speechSynthesis.getVoices();
+  const hindiVoice = voices.find(v => v.lang === "hi-IN");
+  if (hindiVoice) speech.voice = hindiVoice;
 
-      if (!voiceEnabled) {
-        window.speechSynthesis.cancel();
-      }
+  speech.onend = () => {
+    speaking = false;
+    if (listening) startRecognition();
+  };
+
+  speech.onerror = () => {
+    speaking = false;
+    if (listening) startRecognition();
+  };
+
+  window.speechSynthesis.speak(speech);
+}
+
+async function sendToAI(message) {
+  addMessage(message, "user");
+  setStatus("SHINO IS THINKING...");
+
+  const waiting = addMessage("जवाब तैयार हो रहा है...", "bot");
+
+  try {
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
     });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const data = await response.json();
+    const reply = data.reply || "जवाब नहीं मिला।";
 
-      const message = input.value.trim();
-      if (!message) return;
+    waiting.textContent = reply;
+    setStatus("SHINO ONLINE");
+    speak(reply);
 
-      addMessage(message, "user");
-      input.value = "";
+  } catch (error) {
+    waiting.textContent = "कनेक्शन में समस्या है।";
+    setStatus("CONNECTION ERROR");
+    if (listening) startRecognition();
+  }
+}
 
-      const waiting = addMessage(
-        "Shino जवाब दे रही है...",
-        "bot"
-      );
+function setupVoice() {
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-      try {
-        const response = await fetch("/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ message })
-        });
+  if (!SpeechRecognition) {
+    setStatus("VOICE RECOGNITION NOT SUPPORTED");
+    addMessage("इस Chrome में Voice Recognition उपलब्ध नहीं है।", "bot");
+    return;
+  }
 
-        const data = await response.json();
-        const reply = data.reply || "जवाब नहीं मिला।";
+  recognition = new SpeechRecognition();
+  recognition.lang = "en-IN";
+  recognition.continuous = true;
+  recognition.interimResults = false;
 
-        waiting.textContent = reply;
-        speak(reply);
+  recognition.onstart = () => {
+    setStatus(waitingForCommand
+      ? "LISTENING FOR YOUR COMMAND..."
+      : "LISTENING FOR HI SHINO...");
+    orb.classList.add("active");
+  };
 
-      } catch (error) {
-        waiting.textContent =
-          "कनेक्शन में समस्या है। दोबारा कोशिश करो।";
+  recognition.onend = () => {
+    orb.classList.remove("active");
+    if (listening && !speaking) {
+      setTimeout(startRecognition, 700);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    setStatus("MIC: " + event.error.toUpperCase());
+  };
+
+  recognition.onresult = (event) => {
+    const result =
+      event.results[event.results.length - 1][0].transcript.trim();
+
+    const spoken = result.toLowerCase();
+
+    if (
+      spoken.includes("hi shino") ||
+      spoken.includes("hii shino") ||
+      spoken.includes("hey shino")
+    ) {
+      if (!waitingForCommand) {
+        waitingForCommand = true;
+        setStatus("SHINO ACTIVATED");
+        addMessage("Hi Shino", "user");
+
+        speak("जी, मैं सुन रही हूँ। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?");
       }
-    });
-  </script>
+      return;
+    }
+
+    if (waitingForCommand && !speaking) {
+      waitingForCommand = false;
+      sendToAI(result);
+    }
+  };
+
+  startRecognition();
+}
+
+document.getElementById("startBtn").onclick = () => {
+  if (listening) return;
+  listening = true;
+  waitingForCommand = false;
+  setupVoice();
+};
+
+document.getElementById("stopBtn").onclick = () => {
+  listening = false;
+  waitingForCommand = false;
+
+  if (recognition) recognition.stop();
+  window.speechSynthesis.cancel();
+
+  speaking = false;
+  setStatus("SYSTEM STANDBY");
+  orb.classList.remove("active");
+};
+
+document.getElementById("form").onsubmit = (event) => {
+  event.preventDefault();
+  const message = input.value.trim();
+  if (!message) return;
+
+  input.value = "";
+  sendToAI(message);
+};
+</script>
 
 </body>
 </html>
-
-  
