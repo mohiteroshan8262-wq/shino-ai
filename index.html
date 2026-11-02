@@ -2,536 +2,660 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shino AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shino AI - JARVIS</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* { box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #142b46, #050914 65%);
-      color: #eaf7ff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-    }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #153454, #030914 65%);
+  color: #eaf7ff;
+  font-family: Arial, sans-serif;
+}
 
-    .app {
-      width: 100%;
-      max-width: 600px;
-      min-height: 100vh;
-      padding: 22px 16px;
-      display: flex;
-      flex-direction: column;
-    }
+.app {
+  width: 100%;
+  max-width: 650px;
+  margin: auto;
+  padding: 20px 15px;
+}
 
-    header {
-      text-align: center;
-      padding: 12px;
-    }
+header { text-align: center; }
 
-    h1 {
-      color: #54dfff;
-      letter-spacing: 5px;
-      margin-bottom: 6px;
-      text-shadow: 0 0 15px #00bfff;
-    }
+h1 {
+  color: #54dfff;
+  letter-spacing: 5px;
+  text-shadow: 0 0 15px #00bfff;
+  margin-bottom: 5px;
+}
 
-    #status {
-      color: #77eaff;
-      font-size: 12px;
-      letter-spacing: 2px;
-    }
+#status {
+  color: #77eaff;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
 
-    .orb {
-      width: 145px;
-      height: 145px;
-      margin: 20px auto;
-      border-radius: 50%;
-      background: radial-gradient(circle, #b8ffff, #16a9e8 35%, #073b70 70%);
-      box-shadow: 0 0 25px #00bfff, 0 0 65px #0077ff;
-      animation: pulse 3s infinite ease-in-out;
-    }
+.orb {
+  width: 130px;
+  height: 130px;
+  margin: 20px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #b8ffff, #16a9e8 35%, #073b70 70%);
+  box-shadow: 0 0 25px #00bfff, 0 0 65px #0077ff;
+  animation: pulse 3s infinite ease-in-out;
+}
 
-    .orb.active {
-      box-shadow: 0 0 35px #00ffff, 0 0 90px #008cff;
-      animation: pulse 0.8s infinite;
-    }
+.orb.active {
+  box-shadow: 0 0 40px #00ffff, 0 0 90px #008cff;
+}
 
-    @keyframes pulse {
-      50% {
-        transform: scale(1.07);
-      }
-    }
+@keyframes pulse {
+  50% { transform: scale(1.06); }
+}
 
-    #chat {
-      flex: 1;
-      min-height: 250px;
-      max-height: 48vh;
-      overflow-y: auto;
-      padding: 12px;
-      border: 1px solid #17496b;
-      border-radius: 15px;
-      background: #071321cc;
-    }
+/* JARVIS DASHBOARD */
+#dashboard {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #1686b9;
+  border-radius: 18px;
+  background: #071321cc;
+  box-shadow: 0 0 20px #0077ff22;
+}
 
-    .message {
-      padding: 11px 13px;
-      margin: 10px 0;
-      border-radius: 12px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
+#dashboard h2 {
+  text-align: center;
+  color: #54dfff;
+  font-size: 17px;
+  letter-spacing: 3px;
+}
 
-    .user {
-      background: #123d60;
-      margin-left: 35px;
-      text-align: right;
-    }
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
-    .bot {
-      background: #102b36;
-      border: 1px solid #17617a;
-      margin-right: 35px;
-    }
+.dash-card {
+  min-width: 0;
+  padding: 14px 10px;
+  border: 1px solid #175276;
+  border-radius: 12px;
+  background: #0b2032;
+  text-align: center;
+}
 
-    form {
-      display: flex;
-      gap: 8px;
-      margin-top: 15px;
-    }
+.dash-card span {
+  color: #75dfff;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
 
-    input {
-      flex: 1;
-      min-width: 0;
-      padding: 14px;
-      border-radius: 25px;
-      border: 1px solid #1686b9;
-      background: #071321;
-      color: white;
-      outline: none;
-      font-size: 16px;
-    }
+.dash-card h3 {
+  color: #ffffff;
+  font-size: 19px;
+  margin: 10px 0 5px;
+  overflow-wrap: anywhere;
+}
 
-    button {
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 25px;
-      background: #087eb5;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.dash-card p {
+  color: #9ac9df;
+  font-size: 12px;
+  margin: 4px 0;
+}
 
-    button:active {
-      transform: scale(0.96);
-    }
+#chat {
+  min-height: 200px;
+  max-height: 38vh;
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid #17496b;
+  border-radius: 15px;
+  background: #071321cc;
+}
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
+.message {
+  padding: 11px 13px;
+  margin: 10px 0;
+  border-radius: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
 
-    .stop {
-      background: #a52b43;
-    }
+.user {
+  background: #123d60;
+  margin-left: 35px;
+  text-align: right;
+}
 
-    .small {
-      background: #164b62;
-      font-size: 12px;
-    }
+.bot {
+  background: #102b36;
+  border: 1px solid #17617a;
+  margin-right: 35px;
+}
 
-    footer {
-      text-align: center;
-      color: #6c91a8;
-      font-size: 11px;
-      margin-top: 18px;
-    }
-  </style>
+form {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 25px;
+  border: 1px solid #1686b9;
+  background: #071321;
+  color: white;
+  outline: none;
+  font-size: 16px;
+}
+
+button {
+  padding: 12px 15px;
+  border: 0;
+  border-radius: 25px;
+  background: #087eb5;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.stop { background: #a52b43; }
+.small { background: #164b62; font-size: 12px; }
+
+footer {
+  text-align: center;
+  color: #6c91a8;
+  font-size: 11px;
+  margin-top: 18px;
+}
+</style>
 </head>
 
 <body>
-  <main class="app">
+<main class="app">
 
-    <header>
-      <h1>SHINO AI</h1>
-      <div id="status">SYSTEM ONLINE</div>
-    </header>
+<header>
+  <h1>SHINO AI</h1>
+  <div id="status">SYSTEM ONLINE</div>
+</header>
 
-    <div class="orb" id="orb"></div>
+<div class="orb" id="orb"></div>
 
-    <section id="chat" aria-live="polite">
-      <div class="message bot">
-        नमस्ते! मैं Shino हूँ। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?
-      </div>
-    </section>
+<section id="dashboard">
+  <h2>JARVIS DASHBOARD</h2>
 
-    <form id="form">
-      <input
-        id="input"
-        type="text"
-        placeholder="Shino से कुछ पूछें..."
-        autocomplete="off"
-      >
-      <button type="submit">SEND</button>
-    </form>
-
-    <div class="controls">
-      <button id="startBtn">🎙 START VOICE</button>
-      <button id="stopBtn" class="stop">STOP</button>
-      <button id="memoryBtn" class="small">MY MEMORY</button>
-      <button id="clearBtn" class="small">CLEAR CHAT</button>
+  <div class="dash-grid">
+    <div class="dash-card">
+      <span>🕒 LIVE TIME</span>
+      <h3 id="clock">--:--:--</h3>
+      <p id="date">Loading...</p>
     </div>
 
-    <footer>SHINO AI • YOUR PERSONAL ASSISTANT</footer>
+    <div class="dash-card">
+      <span>🔋 BATTERY</span>
+      <h3 id="battery">Checking...</h3>
+      <p id="charging">Checking status...</p>
+    </div>
 
-  </main>
+    <div class="dash-card">
+      <span>📡 INTERNET</span>
+      <h3 id="internet">Checking...</h3>
+      <p id="networkInfo">Connection status</p>
+    </div>
 
-  <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const statusText = document.getElementById("status");
-    const orb = document.getElementById("orb");
+    <div class="dash-card">
+      <span>⚙️ SYSTEM</span>
+      <h3 id="system">ONLINE</h3>
+      <p>Shino AI Core</p>
+    </div>
+  </div>
+</section>
 
-    const HISTORY_KEY = "shino_chat_history";
-    const MEMORY_KEY = "shino_personal_memory";
+<section id="chat" aria-live="polite">
+  <div class="message bot">
+    नमस्ते! मैं Shino हूँ। मेरा JARVIS Dashboard तैयार है। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?
+  </div>
+</section>
 
-    let listening = false;
-    let speaking = false;
-    let waitingForCommand = false;
-    let recognition = null;
+<form id="form">
+  <input id="input" type="text"
+    placeholder="Shino से कुछ पूछें..."
+    autocomplete="off">
+  <button type="submit">SEND</button>
+</form>
 
-    let history = [];
-    let personalMemory = "";
+<div class="controls">
+  <button id="startBtn">🎙 START VOICE</button>
+  <button id="stopBtn" class="stop">STOP</button>
+  <button id="memoryBtn" class="small">MY MEMORY</button>
+  <button id="clearBtn" class="small">CLEAR CHAT</button>
+</div>
 
-    try {
-      history = JSON.parse(
-        localStorage.getItem(HISTORY_KEY) || "[]"
+<footer>SHINO AI • JARVIS PERSONAL ASSISTANT</footer>
+
+</main>
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const statusText = document.getElementById("status");
+const orb = document.getElementById("orb");
+
+const HISTORY_KEY = "shino_chat_history";
+const MEMORY_KEY = "shino_personal_memory";
+
+let listening = false;
+let speaking = false;
+let waitingForCommand = false;
+let recognition = null;
+let history = [];
+let personalMemory = "";
+
+try {
+  history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+  personalMemory = localStorage.getItem(MEMORY_KEY) || "";
+} catch (error) {
+  console.log("Memory loading error:", error);
+}
+
+/* CLOCK AND DATE */
+function updateClock() {
+  const now = new Date();
+
+  document.getElementById("clock").textContent =
+    now.toLocaleTimeString("en-IN");
+
+  document.getElementById("date").textContent =
+    now.toLocaleDateString("hi-IN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+/* BATTERY */
+async function updateBattery() {
+  const batteryText = document.getElementById("battery");
+  const chargingText = document.getElementById("charging");
+
+  if (!navigator.getBattery) {
+    batteryText.textContent = "Unavailable";
+    chargingText.textContent = "Browser support नहीं है";
+    return;
+  }
+
+  try {
+    const battery = await navigator.getBattery();
+
+    function showBattery() {
+      batteryText.textContent =
+        Math.round(battery.level * 100) + "%";
+
+      chargingText.textContent =
+        battery.charging ? "⚡ Charging" : "Not charging";
+    }
+
+    showBattery();
+
+    battery.addEventListener("levelchange", showBattery);
+    battery.addEventListener("chargingchange", showBattery);
+
+  } catch (error) {
+    batteryText.textContent = "Unavailable";
+    chargingText.textContent = "Permission unavailable";
+  }
+}
+
+updateBattery();
+
+/* INTERNET */
+function updateInternet() {
+  const online = navigator.onLine;
+
+  document.getElementById("internet").textContent =
+    online ? "CONNECTED" : "OFFLINE";
+
+  document.getElementById("networkInfo").textContent =
+    online ? "Internet available" : "Check your connection";
+}
+
+window.addEventListener("online", updateInternet);
+window.addEventListener("offline", updateInternet);
+updateInternet();
+
+/* SYSTEM STATUS */
+function setStatus(message) {
+  statusText.textContent = message;
+}
+
+/* CHAT */
+function addMessage(message, type) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = message;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function saveHistory() {
+  history = history.slice(-30);
+
+  try {
+    localStorage.setItem(
+      HISTORY_KEY,
+      JSON.stringify(history)
+    );
+  } catch (error) {
+    console.log("History save error:", error);
+  }
+}
+
+/* VOICE OUTPUT */
+function speak(text) {
+  if (!window.speechSynthesis) return;
+
+  window.speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "hi-IN";
+  speech.rate = 0.9;
+  speech.pitch = 1.1;
+
+  speech.onstart = () => {
+    speaking = true;
+  };
+
+  speech.onend = () => {
+    speaking = false;
+
+    if (listening && recognition) {
+      setTimeout(startRecognition, 500);
+    }
+  };
+
+  speech.onerror = () => {
+    speaking = false;
+  };
+
+  window.speechSynthesis.speak(speech);
+}
+
+/* AI CHAT AND MEMORY */
+async function sendToAI(message) {
+  addMessage(message, "user");
+  setStatus("SHINO THINKING...");
+
+  const rememberMatch = message.match(
+    /(?:shino\s+)?(?:yaad rakhna|yaad rakh lo|याद रखना|याद रखो|remember this)\s*[:,-]?\s*(.+)/i
+  );
+
+  if (rememberMatch && rememberMatch[1]) {
+    const newMemory = rememberMatch[1].trim();
+
+    if (newMemory) {
+      personalMemory +=
+        (personalMemory ? "\n" : "") + newMemory;
+
+      personalMemory = personalMemory
+        .split("\n")
+        .slice(-20)
+        .join("\n");
+
+      localStorage.setItem(MEMORY_KEY, personalMemory);
+
+      const reply =
+        "ठीक है! मैंने यह बात अपनी Personal Memory में सेव कर ली है।";
+
+      addMessage(reply, "bot");
+
+      history.push(
+        { role: "user", content: message },
+        { role: "assistant", content: reply }
       );
 
-      personalMemory =
-        localStorage.getItem(MEMORY_KEY) || "";
-    } catch (error) {
-      console.log("Memory loading error:", error);
+      saveHistory();
+      setStatus("SHINO ONLINE");
+      speak(reply);
+      return;
+    }
+  }
+
+  try {
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: message,
+        history: history.slice(-12),
+        personalMemory: personalMemory
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Server error");
     }
 
-    function setStatus(message) {
-      statusText.textContent = message;
+    const reply =
+      data.reply || data.response || data.message;
+
+    if (!reply) {
+      throw new Error("AI का जवाब नहीं मिला।");
     }
 
-    function addMessage(message, type) {
-      const div = document.createElement("div");
-      div.className = "message " + type;
-      div.textContent = message;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    }
+    history.push(
+      { role: "user", content: message },
+      { role: "assistant", content: reply }
+    );
 
-    function saveHistory() {
-      history = history.slice(-30);
+    saveHistory();
 
-      try {
-        localStorage.setItem(
-          HISTORY_KEY,
-          JSON.stringify(history)
-        );
-      } catch (error) {
-        console.log("History save error:", error);
-      }
-    }
-
-    function speak(text) {
-      if (!window.speechSynthesis) return;
-
-      window.speechSynthesis.cancel();
-
-      const speech = new SpeechSynthesisUtterance(text);
-      speech.lang = "hi-IN";
-      speech.rate = 0.9;
-      speech.pitch = 1.1;
-
-      speech.onstart = () => {
-        speaking = true;
-      };
-
-      speech.onend = () => {
-        speaking = false;
-
-        if (listening && recognition) {
-          setTimeout(startRecognition, 500);
-        }
-      };
-
-      speech.onerror = () => {
-        speaking = false;
-      };
-
-      window.speechSynthesis.speak(speech);
-    }
-
-    async function sendToAI(message) {
-      addMessage(message, "user");
-      setStatus("SHINO THINKING...");
-
-      const rememberMatch = message.match(
-        /(?:shino\s+)?(?:yaad rakhna|yaad rakh lo|याद रखना|याद रखो|remember this)\s*[:,-]?\s*(.+)/i
-      );
-
-      if (rememberMatch && rememberMatch[1]) {
-        const newMemory = rememberMatch[1].trim();
-
-        if (newMemory) {
-          personalMemory +=
-            (personalMemory ? "\n" : "") + newMemory;
-
-          personalMemory = personalMemory
-            .split("\n")
-            .slice(-20)
-            .join("\n");
-
-          localStorage.setItem(
-            MEMORY_KEY,
-            personalMemory
-          );
-
-          const reply =
-            "ठीक है! मैंने यह बात अपनी Personal Memory में सेव कर ली है।";
-
-          addMessage(reply, "bot");
-
-          history.push(
-            { role: "user", content: message },
-            { role: "assistant", content: reply }
-          );
-
-          saveHistory();
-          setStatus("SHINO ONLINE");
-          speak(reply);
-          return;
-        }
-      }
-
-      try {
-        const response = await fetch("/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: message,
-            history: history.slice(-12),
-            personalMemory: personalMemory
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Server error");
-        }
-
-        const reply =
-          data.reply || data.response || data.message;
-
-        if (!reply) {
-          throw new Error("AI का जवाब नहीं मिला।");
-        }
-
-        history.push(
-          { role: "user", content: message },
-          { role: "assistant", content: reply }
-        );
-
-        saveHistory();
-
-        addMessage(reply, "bot");
-        setStatus("SHINO ONLINE");
-        speak(reply);
-
-      } catch (error) {
-        console.error(error);
-
-        addMessage(
-          "माफ़ कीजिए, अभी जवाब नहीं मिल पाया।",
-          "bot"
-        );
-
-        setStatus("CONNECTION ERROR");
-      }
-    }
-
-    // Show saved personal memory
-    document.getElementById("memoryBtn").onclick = () => {
-      if (personalMemory.trim()) {
-        addMessage(
-          "मेरी Personal Memory:\n" + personalMemory,
-          "bot"
-        );
-      } else {
-        addMessage(
-          "अभी मेरी Personal Memory खाली है। कुछ याद रखने के लिए कहें: याद रखना: ...",
-          "bot"
-        );
-      }
-    };
-
-    // Clear chat history
-    document.getElementById("clearBtn").onclick = () => {
-      if (!confirm("क्या आप Chat History मिटाना चाहते हैं?")) {
-        return;
-      }
-
-      history = [];
-      localStorage.removeItem(HISTORY_KEY);
-      chat.innerHTML = "";
-
-      addMessage("Chat History साफ़ कर दी गई है।", "bot");
-    };
-
-    // Text chat
-    document.getElementById("form").onsubmit = (event) => {
-      event.preventDefault();
-
-      const message = input.value.trim();
-
-      if (!message) return;
-
-      input.value = "";
-      sendToAI(message);
-    };
-
-    // Voice recognition
-    const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
-
-    function startRecognition() {
-      if (!listening || speaking || !recognition) return;
-
-      try {
-        recognition.start();
-      } catch (error) {
-        console.log("Recognition start:", error);
-      }
-    }
-
-    function setupVoice() {
-      if (!SpeechRecognition) {
-        setStatus("VOICE NOT SUPPORTED");
-
-        addMessage(
-          "इस Chrome में Voice Recognition उपलब्ध नहीं है।",
-          "bot"
-        );
-
-        listening = false;
-        return;
-      }
-
-      recognition = new SpeechRecognition();
-
-      recognition.lang = "hi-IN";
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 3;
-
-      recognition.onstart = () => {
-        setStatus(
-          waitingForCommand
-            ? "LISTENING FOR COMMAND..."
-            : "LISTENING FOR HI SHINO..."
-        );
-
-        orb.classList.add("active");
-      };
-
-      recognition.onresult = (event) => {
-        const result =
-          event.results[event.results.length - 1][0]
-            .transcript.trim();
-
-        const spoken = result.toLowerCase();
-
-        if (
-          spoken.includes("hi shino") ||
-          spoken.includes("hey shino") ||
-          spoken.includes("हाय शिनो") ||
-          spoken.includes("हे शिनो")
-        ) {
-          if (!waitingForCommand) {
-            waitingForCommand = true;
-
-            speak(
-              "जी, मैं सुन रही हूँ। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?"
-            );
-          }
-
-          return;
-        }
-
-        if (waitingForCommand && !speaking) {
-          waitingForCommand = false;
-          sendToAI(result);
-        }
-      };
-
-      recognition.onerror = (event) => {
-        console.log("Voice error:", event.error);
-
-        if (event.error === "not-allowed") {
-          setStatus("MICROPHONE PERMISSION DENIED");
-          listening = false;
-        } else {
-          setStatus("VOICE ERROR");
-        }
-      };
-
-      recognition.onend = () => {
-        orb.classList.remove("active");
-
-        if (listening && !speaking) {
-          setTimeout(startRecognition, 700);
-        }
-      };
-
-      startRecognition();
-    }
-
-    document.getElementById("startBtn").onclick = () => {
-      if (listening) return;
-
-      listening = true;
-      waitingForCommand = false;
-
-      setupVoice();
-    };
-
-    document.getElementById("stopBtn").onclick = () => {
-      listening = false;
-      waitingForCommand = false;
-
-      if (recognition) {
-        try {
-          recognition.stop();
-        } catch (error) {}
-      }
-
-      window.speechSynthesis.cancel();
-
-      speaking = false;
-      setStatus("SYSTEM STANDBY");
-      orb.classList.remove("active");
-    };
-
+    addMessage(reply, "bot");
     setStatus("SHINO ONLINE");
-  </script>
+    speak(reply);
+
+  } catch (error) {
+    console.error(error);
+
+    addMessage(
+      "माफ़ कीजिए, अभी जवाब नहीं मिल पाया।",
+      "bot"
+    );
+
+    setStatus("CONNECTION ERROR");
+  }
+}
+
+/* MEMORY BUTTON */
+document.getElementById("memoryBtn").onclick = () => {
+  if (personalMemory.trim()) {
+    addMessage(
+      "मेरी Personal Memory:\n" + personalMemory,
+      "bot"
+    );
+  } else {
+    addMessage(
+      "अभी मेरी Personal Memory खाली है। याद रखने के लिए कहें: याद रखना: ...",
+      "bot"
+    );
+  }
+};
+
+/* CLEAR CHAT */
+document.getElementById("clearBtn").onclick = () => {
+  if (!confirm("क्या आप Chat History मिटाना चाहते हैं?")) {
+    return;
+  }
+
+  history = [];
+  localStorage.removeItem(HISTORY_KEY);
+  chat.innerHTML = "";
+
+  addMessage("Chat History साफ़ कर दी गई है।", "bot");
+};
+
+/* TEXT CHAT */
+document.getElementById("form").onsubmit = (event) => {
+  event.preventDefault();
+
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  input.value = "";
+  sendToAI(message);
+};
+
+/* VOICE RECOGNITION */
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+function startRecognition() {
+  if (!listening || speaking || !recognition) return;
+
+  try {
+    recognition.start();
+  } catch (error) {
+    console.log("Recognition start:", error);
+  }
+}
+
+function setupVoice() {
+  if (!SpeechRecognition) {
+    setStatus("VOICE NOT SUPPORTED");
+
+    addMessage(
+      "इस Chrome में Voice Recognition उपलब्ध नहीं है।",
+      "bot"
+    );
+
+    listening = false;
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+
+  recognition.lang = "hi-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  recognition.onstart = () => {
+    setStatus(
+      waitingForCommand
+        ? "LISTENING FOR COMMAND..."
+        : "LISTENING FOR HI SHINO..."
+    );
+
+    orb.classList.add("active");
+  };
+
+  recognition.onresult = (event) => {
+    const result =
+      event.results[event.results.length - 1][0]
+        .transcript.trim();
+
+    const spoken = result.toLowerCase();
+
+    if (
+      spoken.includes("hi shino") ||
+      spoken.includes("hey shino") ||
+      spoken.includes("हाय शिनो") ||
+      spoken.includes("हे शिनो")
+    ) {
+      if (!waitingForCommand) {
+        waitingForCommand = true;
+
+        speak(
+          "जी, मैं सुन रही हूँ। बताइए, मैं आपकी क्या सहायता कर सकती हूँ?"
+        );
+      }
+
+      return;
+    }
+
+    if (waitingForCommand && !speaking) {
+      waitingForCommand = false;
+      sendToAI(result);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    console.log("Voice error:", event.error);
+
+    if (event.error === "not-allowed") {
+      setStatus("MICROPHONE PERMISSION DENIED");
+      listening = false;
+    } else {
+      setStatus("VOICE ERROR");
+    }
+  };
+
+  recognition.onend = () => {
+    orb.classList.remove("active");
+
+    if (listening && !speaking) {
+      setTimeout(startRecognition, 700);
+    }
+  };
+
+  startRecognition();
+}
+
+document.getElementById("startBtn").onclick = () => {
+  if (listening) return;
+
+  listening = true;
+  waitingForCommand = false;
+
+  setupVoice();
+};
+
+document.getElementById("stopBtn").onclick = () => {
+  listening = false;
+  waitingForCommand = false;
+
+  if (recognition) {
+    try {
+      recognition.stop();
+    } catch (error) {}
+  }
+
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+
+  speaking = false;
+  setStatus("SYSTEM STANDBY");
+  orb.classList.remove("active");
+};
+
+setStatus("SHINO ONLINE");
+</script>
+
 </body>
 </html>
