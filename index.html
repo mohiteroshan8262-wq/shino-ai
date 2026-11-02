@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shino AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10121b;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 18px;
+      text-align: center;
+      background: #1c2030;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #chat { flex: 1; padding: 16px; overflow-y: auto; }
+    .msg {
+      padding: 12px 14px;
+      margin: 10px 0;
+      border-radius: 14px;
+      max-width: 85%;
+      white-space: pre-wrap;
+    }
+    .bot { background: #252b3c; margin-right: auto; }
+    .user { background: #3556a8; margin-left: auto; }
+    form {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: #1c2030;
+    }
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 13px;
+      border-radius: 10px;
+      border: 0;
+      font-size: 16px;
+    }
+    button {
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      background: #617cff;
+      color: white;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>Shino AI</header>
+
+  <main id="chat">
+    <div class="msg bot">नमस्ते! मैं Shino हूँ। मुझसे हिंदी में बात करो।</div>
+  </main>
+
+  <form id="form">
+    <input id="message" placeholder="Shino से कुछ पूछो..." autocomplete="off" required>
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("form");
+    const input = document.getElementById("message");
+    const chat = document.getElementById("chat");
+
+    function add(text, who) {
+      const div = document.createElement("div");
+      div.className = "msg " + who;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+
+      add(message, "user");
+      input.value = "";
+      const waiting = add("Shino जवाब दे रही है...", "bot");
+
+      try {
+        const response = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        waiting.textContent = data.reply || "जवाब नहीं मिला।";
+      } catch (error) {
+        waiting.textContent = "कनेक्शन में समस्या है। दोबारा कोशिश करो।";
+      }
+    });
+  </script>
+</body>
+</html>
